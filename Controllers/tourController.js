@@ -1,8 +1,15 @@
 const express = require('express');
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
+const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { multi } = require('../jobs/emailQueue');
+const {
+  MILES_PER_METER,
+  KM_PER_METER,
+  EARTH_RADIUS_MILES,
+  EARTH_RADIUS_KM,
+} = require('../utils/constants');
 
 // heandl tours cheap
 exports.getTopcheap = (req, res, next) => {
@@ -12,151 +19,89 @@ exports.getTopcheap = (req, res, next) => {
   next();
 };
 
-// getAll Tours
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  // Excute Query
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .pagintion();
-  const tours = await features.query;
-
-  // Respons and()
-
-  res.status(200).json({
-    status: 'success',
-    result: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
-
 // POST (Create New Tour)
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({
-    status: 'success',
-    data: {
-      newTour,
-    },
-  });
-});
+exports.createTour = factory.createOne(Tour);
 
-// GET Tour ID(Tour id)
-exports.getTourID = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id); //short
-  // Tour.findOne({_id:req.params.id})
-  if (!tour) {
-    return next(new Error('No tour found with  that ID ', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
 /// PATCH ID (Update Tour)
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!tour) {
-    return next(new AppError('No tour found with  that ID', 404));
-  }
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
+exports.updateTour = factory.updateOne(Tour);
 
 // Delete Tour
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id, {});
-  if (!tour) {
-    return next(new AppError('No tour found with  that ID ', 404));
-  }
-  res.status(204).end();
-});
+exports.deleteTour = factory.deleteOne(Tour);
+
+//GET
+
+exports.getAllTours = factory.getAll(Tour);
+exports.getTourID = factory.getOne(Tour, { path: 'reviews' });
+
 //  :  thực hiện các phép tính tổng hợp nâng cao của chuy vấn đên db
-exports.getTourStats = catchAsync(async (req, res, next) => {
-  const stats = await Tour.aggregate([
-    {
-      $match: { ratingsAverage: { $gte: 4.5 } },
-    },
-    {
-      $group: {
-        _id: '$difficulty',
-        numTours: { $sum: 1 },
-        numRatings: { $sum: '$ratingsQuantity' },
-        agvRating: { $avg: '$ratingsAverage' },
-        avgPrice: { $avg: '$price' },
-        minPrice: { $min: '$price' },
-        maxPrice: { $max: '$price' },
-      },
-    },
-    {
-      $sort: { avgPrice: 1 },
-    },
-  ]);
-  res.status(200).json({
-    status: 'success',
-    data: {
-      stats,
-    },
-  });
-});
-
+exports.getTourStats = factory.getStats(Tour);
 // GET MONTH
-exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
-  const year = parseInt(req.params.year);
-  const plan = await Tour.aggregate([
-    {
-      $unwind: '$startDates', // []=>el1,el2
-    },
-    {
-      $match: {
-        startDates: {
-          $gte: new Date(`${year}-01-01`),
-          $lte: new Date(`${year}-12-31`),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: { $month: '$startDates' },
-        numTourStarts: { $sum: 1 },
-        tours: { $push: '$name' },
-      },
-    },
-    //_id => name
-    { $addFields: { month: '$_id' } },
+exports.getMonthlyPlan = factory.getMonth(Tour);
 
-    //delete _id
+//35.03826883498337, 137.1042728287075
+exports.getTourWithin = catchAsync(async (req, res, next) => {
+  const { distance: distanceStr, latlng, unit } = req.params;
+
+  // Validate và chuyển đổi distance thành số
+  const distance = parseFloat(distanceStr);
+  if (isNaN(distance)) {
+    return next(new AppError('Distance must be a number', 400));
+  }
+  // Validate và parse tọa độ
+  const [lat, lng] = latlng.split(',').map(coord => parseFloat(coord));
+
+  // Validate phạm vi tọa độ
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return next(
+      new AppError(
+        'Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.',
+        400,
+      ),
+    );
+  }
+
+  // Chuyển đổi khoảng cách sang radians
+  const radius =
+    unit === 'mi' ? distance / EARTH_RADIUS_MILES : distance / EARTH_RADIUS_KM;
+
+  try {
+    const tours = await Tour.find({
+      startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+    });
+
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        data: tours,
+      },
+    });
+  } catch (error) {
+    // Xử lý lỗi cụ thể từ MongoDB Geo queries
+    if (error.code === 2) {
+      return next(new AppError('Invalid coordinates for geospatial query', 400));
+    }
+    throw error; // Ném lại lỗi khác để global error handler xử lý
+  }
+});
+exports.getDistancen = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  // Validate và parse tọa độ
+  const [lat, lng] = latlng.split(',').map(coord => parseFloat(coord));
+  const multiplier = unit === 'mi' ? MILES_PER_METER : KM_PER_METER;
+  const distances = await Tour.aggregate([
     {
-      $project: {
-        _id: 0,
+      $geoNear: {
+        near: { type: 'Point', coordinates: [lng, lat] },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier,
       },
     },
-    //10--1
-    {
-      $sort: {
-        numTourStarts: -1,
-      },
-    },
+    { $project: { distance: 1, name: 1 } },
   ]);
+
   res.status(200).json({
     status: 'success',
-    result: plan.length,
-    data: {
-      plan,
-    },
+    data: distances,
   });
 });

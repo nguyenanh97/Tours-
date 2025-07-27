@@ -1,0 +1,4 @@
+exports.MILES_PER_METER = 0.000621371;
+exports.KM_PER_METER = 0.001;
+exports.EARTH_RADIUS_MILES = 3963.2;
+exports.EARTH_RADIUS_KM = 6378.1;

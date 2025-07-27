@@ -1,17 +1,35 @@
-const mongoose = require('mongoose');
+require('dotenv').config();
 const app = require('./app');
-const dotenv = require('dotenv');
-//config
-dotenv.config({ path: './config.env' });
-const DB = process.env.MONGO_URI.replace(
-  '<PASSWORD>',
-  process.env.DB_PASSWORD
-);
-mongoose.connect(DB, {}).then(() => {
-  console.log('DB connection success ful!');
+const connectDB = require('./config/db');
+const logger = require('./utils/logger');
+
+process.on('uncaughtException', err => {
+  logger.error('Uncaught Exception:', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  });
+  console.error(err);
+  console.log('UncaughtException! Shutting Down...');
+  process.exit(1);
 });
 
+connectDB();
+
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`App running on prot ${port}`);
+const server = app.listen(port, () => {
+  logger.info(`App running on port ${port}`);
+});
+
+// UnHandled Rejection
+process.on('unhandledRejection', err => {
+  logger.error('Unhandled Rejection:', {
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+  });
+  console.log('Unhandled Rejection! Shutting Down...');
+  server.close(() => {
+    process.exit(1);
+  });
 });

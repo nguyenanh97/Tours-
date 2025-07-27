@@ -1,0 +1,134 @@
+[
+  {
+    "name": "Aichi",
+    "duration": 6,
+    "maxGroupSize": 25,
+    "difficulty": "difficult",
+    "ratingsAverage": 4.5,
+    "ratingsQuantity": 88,
+    "price": 576,
+    "summary": "Explore the prefecture of Aichi (愛知県) located in Chubu, Japan.",
+    "description": "Aichi Prefecture (愛知県) is located in the Chubu region on the island of Honshu. It is home to Nagoya and has a total area of 5173.07 km². The highest elevation is 1415.2 meters. The population as of 2020 was 7,542,415.",
+    "imageCover": "aichi-cover.jpg",
+    "images": ["aichi-1.jpg", "aichi-2.jpg", "aichi-3.jpg"],
+    "startDates": [
+      "2024-09-15T09:00:00.000Z",
+      "2024-11-01T09:00:00.000Z",
+      "2025-02-20T09:00:00.000Z"
+    ],
+    "startLocation": {
+      "description": "Aichi Central Station, Japan",
+      "type": "Point",
+      "coordinates": [139.6917, 35.6895],
+      "address": "Aichi Station, Japan"
+    },
+    "guides": [],
+    "locations": [
+      {
+        "description": "Aichi Main Spot",
+        "type": "Point",
+        "coordinates": [139.6917, 35.6895],
+        "day": 1
+      }
+    ]
+  },
+  {
+    "name": "Aomori",
+    "duration": 7,
+    "maxGroupSize": 35,
+    "difficulty": "easy",
+    "ratingsAverage": 4.5,
+    "ratingsQuantity": 33,
+    "price": 518,
+    "summary": "Explore the prefecture of Aomori (青森県) located in Tohoku, Japan.",
+    "description": "Aomori Prefecture (青森県) is located in the Tohoku region on the island of Honshu. It is home to Aomori and has a total area of 9645.64 km². The highest elevation is 1624.7 meters. The population as of 2020 was 1,237,984.",
+    "imageCover": "aomori-cover.jpg",
+    "images": ["aomori-1.jpg", "aomori-2.jpg", "aomori-3.jpg"],
+    "startDates": [
+      "2024-09-15T09:00:00.000Z",
+      "2024-11-01T09:00:00.000Z",
+      "2025-02-20T09:00:00.000Z"
+    ],
+    "startLocation": {
+      "description": "Aomori Central Station, Japan",
+      "type": "Point",
+      "coordinates": [139.7017, 35.6995],
+      "address": "Aomori Station, Japan"
+    },
+    "guides": [],
+    "locations": [
+      {
+        "description": "Aomori Main Spot",
+        "type": "Point",
+        "coordinates": [139.7017, 35.6995],
+        "day": 1
+      }
+    ]
+  },
+  {
+    "name": "Akita",
+    "duration": 4,
+    "maxGroupSize": 25,
+    "difficulty": "difficult",
+    "ratingsAverage": 4.6,
+    "ratingsQuantity": 41,
+    "price": 657,
+    "summary": "Explore the prefecture of Akita (秋田県) located in Tohoku, Japan.",
+    "description": "Akita Prefecture (秋田県) is located in the Tohoku region on the island of Honshu. It is home to Akita and has a total area of 11637.52 km². The highest elevation is 1637 meters. The population as of 2020 was 959,502.",
+    "imageCover": "akita-cover.jpg",
+    "images": ["akita-1.jpg", "akita-2.jpg", "akita-3.jpg"],
+    "startDates": [
+      "2024-09-15T09:00:00.000Z",
+      "2024-11-01T09:00:00.000Z",
+      "2025-02-20T09:00:00.000Z"
+    ],
+    "startLocation": {
+      "description": "Akita Central Station, Japan",
+      "type": "Point",
+      "coordinates": [139.7117, 35.709500000000006],
+      "address": "Akita Station, Japan"
+    },
+    "guides": [],
+    "locations": [
+      {
+        "description": "Akita Main Spot",
+        "type": "Point",
+        "coordinates": [139.7117, 35.709500000000006],
+        "day": 1
+      }
+    ]
+  },
+  {
+    "name": "Chiba",
+    "duration": 8,
+    "maxGroupSize": 30,
+    "difficulty": "medium",
+    "ratingsAverage": 4.5,
+    "ratingsQuantity": 59,
+    "price": 321,
+    "summary": "Explore the prefecture of Chiba (千葉県) located in Kanto, Japan.",
+    "description": "Chiba Prefecture (千葉県) is located in the Kanto region on the island of Honshu. It is home to Chiba and has a total area of 5157.57 km². The highest elevation is 408.2 meters. The population as of 2020 was 6,284,480.",
+    "imageCover": "chiba-cover.jpg",
+    "images": ["chiba-1.jpg", "chiba-2.jpg", "chiba-3.jpg"],
+    "startDates": [
+      "2024-09-15T09:00:00.000Z",
+      "2024-11-01T09:00:00.000Z",
+      "2025-02-20T09:00:00.000Z"
+    ],
+    "startLocation": {
+      "description": "Chiba Central Station, Japan",
+      "type": "Point",
+      "coordinates": [139.7217, 35.719500000000004],
+      "address": "Chiba Station, Japan"
+    },
+    "guides": [],
+    "locations": [
+      {
+        "description": "Chiba Main Spot",
+        "type": "Point",
+        "coordinates": [139.7217, 35.719500000000004],
+        "day": 1
+      }
+    ]
+  }
+]
